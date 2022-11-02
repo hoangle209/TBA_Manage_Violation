@@ -17,13 +17,13 @@ def onSegment(p:tuple, q:tuple, r:tuple) -> bool:
 # 2 --> Counterclockwise
 def orientation(p:tuple, q:tuple, r:tuple) -> int:
 	val = (((q[1] - p[1]) * (r[0] - q[0])) - 
-        ((q[0] - p[0]) * (r[1] - q[1])))	
+	((q[0] - p[0]) * (r[1] - q[1])))	
 	if val == 0:
-			return 0
+		return 0
 	if val > 0:
-			return 1 
+		return 1 
 	else:
-			return 2 
+		return 2 
 
 def doIntersect(p1, q1, p2, q2):
 	# Find the four orientations needed for
@@ -57,39 +57,39 @@ def doIntersect(p1, q1, p2, q2):
 
 # Returns true if the point p lies inside the polygon[] with n vertices
 def is_inside_polygon(points:list, p:tuple) -> bool:
-		n = len(points)
-		if n < 3:
-				return False # There must be at least 3 vertices in polygon
-		# Create a point for line segment
-		# from p to infinite
-		extreme = (INT_MAX, p[1])
-		
-		# To count number of points in polygon
-		# whose y-coordinate is equal to
-		# y-coordinate of the point
-		decrease = 0
-		count = i = 0
-		
-		while True:
-				next = (i + 1) % n
-				if(points[i][1] == p[1]):
-						decrease += 1
-				# Check if the line segment from 'p' to
-				# 'extreme' intersects with the line
-				# segment from 'polygon[i]' to 'polygon[next]'
-				if (doIntersect(points[i], points[next], p, extreme)):				
-					# If the point 'p' is collinear with line
-					# segment 'i-next', then check if it lies
-					# on segment. If it lies, return true, otherwise false
-					if orientation(points[i], p, points[next]) == 0:
-							return onSegment(points[i], p, points[next])				
-					count += 1	
-				i = next
-				if (i == 0):
-						break	
-		# Reduce the count by decrease amount
-		# as these points would have been added twice
-		count -= decrease
-		
-		# Return true if count is odd, false otherwise
-		return (count % 2 == 1)
+	n = len(points)
+	if n < 3:
+			return False # There must be at least 3 vertices in polygon
+	# Create a point for line segment
+	# from p to infinite
+	extreme = (INT_MAX, p[1])
+
+	# To count number of points in polygon
+	# whose y-coordinate is equal to
+	# y-coordinate of the point
+	decrease = 0
+	count = i = 0
+
+	while True:
+		next = (i + 1) % n
+		if(points[i][1] == p[1]):
+			decrease += 1
+		# Check if the line segment from 'p' to
+		# 'extreme' intersects with the line
+		# segment from 'polygon[i]' to 'polygon[next]'
+		if (doIntersect(points[i], points[next], p, extreme)):				
+			# If the point 'p' is collinear with line
+			# segment 'i-next', then check if it lies
+			# on segment. If it lies, return true, otherwise false
+			if orientation(points[i], p, points[next]) == 0:
+				return onSegment(points[i], p, points[next])				
+			count += 1	
+		i = next
+		if (i == 0):
+			break	
+	# Reduce the count by decrease amount
+	# as these points would have been added twice
+	count -= decrease
+
+	# Return true if count is odd, false otherwise
+	return (count % 2 == 1)
