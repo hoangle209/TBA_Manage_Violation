@@ -1,4 +1,4 @@
-from .inference import _load_model, _inference_v2
+from .inference import _load_model, video_inference_v2
 from .check_violate import CheckViolate
 
 import argparse
@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description='TBA Helmets Detection')
 
 parser.add_argument('--weight', type = str, metarvar='', help='weight path of the model')
 parser.add_argument('--agnostic', action = 'store_true', help='agnostic nms')
-parser.add_argument('--conf', type = float, metarvar='', help='confidence thresh')
+parser.add_argument('--conf', type = float, metarvar='', help='confidence thresh', default = 0.65)
 parser.add_argument('--vertices', type = str, metarvar='', help='path to txt storing vertices and classes')
 parser.add_argument('--approx', action = 'store_true', help='approximation rectangle around vertices')
 parser.add_argument('--robust', action = 'store_true', help='robust detection')
@@ -17,7 +17,7 @@ parser.add_argument('--mcv', type = int, metavar='', help='maximum number of vio
 parser.add_argument('--mntv', type = int, metavar='', help='number of maximum consecutive frames that keep tracking violation', default=3)
 parser.add_argument('--cam-id', type = str, metavar='', help='camera id')
 parser.add_argument('--size', type = tuple, metavar='', help='Input image size')
-
+parser.add_argument('--grid-size', type = int, metavar='', help='grid size for tiling detection', default = 576)
 
 args = parser.parse_args()
 
@@ -28,7 +28,7 @@ def run():
     conf = args.conf
     model = _load_model(weight, agnostic, conf)
 
-    #TODO
+    # TODO - check type that save vertices and classes
     vertices = None
     classes = None
     size = None
@@ -36,17 +36,26 @@ def run():
     max_count_violate = args.mcv
     max_num_track_violate = args.mntv
     approx = args.aaprox
-
-    ckv = CheckViolate(vertices, max_count_violate, max_num_track_violate, approx, size)
-    rect = ckv.bounding_rect
+    robust = args.robust
+    grid_size = args.grid_size
     
     cam_id = args.cam_id
-    vid = cv.VideoCapture(cam_id)
+    show = args.show
+    video_inference_v2(cam_id,
+                       model,
+                       vertices,
+                       classes,
+                       grid_size,
+                       robust,
+                       max_count_violate,
+                       max_num_track_violate,
+                       approx,
+                       size,
+                       show)
 
-    while True:
-          succ, frame = vid.read()
-          if not succ:
-              break
 
-          _inference_v2(frame[..., ::-1], model, vertices, robust = args.robust)
+if __name__ == '__main__':
+    run()
+
+    
 
