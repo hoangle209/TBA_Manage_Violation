@@ -98,7 +98,7 @@ def video_inference_v2(cam_id,
                        size)
     
     bounding_rect = ckv.bounding_rect
-    bounding_rect = map(_auto_size, bounding_rect)
+    bounding_rect = list(map(_auto_size, bounding_rect))
 
     bbes = []
 
@@ -108,8 +108,12 @@ def video_inference_v2(cam_id,
         if not succ:
             break
         for rect in bounding_rect:
-            bb = _inference_v2(frame[...,::-1], model, rect, grid_size, robust)
-            bbes += bb
+            bb = _inference_v2(frame[...,::-1], 
+                               model, 
+                               rect, 
+                               grid_size, 
+                               robust)
+            bbes.append(bb)
             
         isViolate = ckv.run(bbes, classes)
 

@@ -45,11 +45,14 @@ class CheckViolate:
 
     def is_violate_rectangle(self, bboxes, vertices, labels):
         for bb in bboxes:
-            cx = (bb[0]+bb[2])/2
-            cy = (bb[1]+bb[3])/2
+            try:
+                cx = (bb[0]+bb[2])/2
+                cy = (bb[1]+bb[3])/2
 
-            if bb[-1] not in labels and self.is_inside_rectangle((cx, cy), vertices):
-                return True
+                if bb[-1] not in labels and self.is_inside_rectangle((cx, cy), vertices):
+                    return True
+            except:
+                pass
         return False
 
 

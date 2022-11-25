@@ -6,10 +6,12 @@ import cv2 as cv
 
 parser = argparse.ArgumentParser(description='TBA Helmets Detection')
 
-parser.add_argument('--weight', type = str, metarvar='', help='weight path of the model')
+parser.add_argument('--weight', type = str, metavar='', help='weight path of the model')
 parser.add_argument('--agnostic', action = 'store_true', help='agnostic nms')
-parser.add_argument('--conf', type = float, metarvar='', help='confidence thresh', default = 0.65)
-parser.add_argument('--vertices', type = str, metarvar='', help='path to txt storing vertices and classes')
+parser.add_argument('--conf', type = float, metavar='', help='confidence thresh', default = 0.65)
+# parser.add_argument('--vertices', type = str, metavar='', help='path to txt storing vertices and classes')
+parser.add_argument('--vertices', type = list, metavar='', help='vertices')
+parser.add_argument('--classes', type = list, metavar='', help='classes')
 parser.add_argument('--approx', action = 'store_true', help='approximation rectangle around vertices')
 parser.add_argument('--robust', action = 'store_true', help='robust detection')
 parser.add_argument('--show', action = 'store_true', help='live streaming')
