@@ -1,5 +1,5 @@
-from .inference import _load_model, video_inference_v2
-from .check_violate import CheckViolate
+from inference import _load_model, video_inference_v2
+from check_violate import CheckViolate
 
 import argparse
 import cv2 as cv

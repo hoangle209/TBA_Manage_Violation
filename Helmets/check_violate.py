@@ -1,5 +1,5 @@
-from Helmets.utils.check_violate_polygon import is_inside_polygon
-from Helmets.utils.check_violate_rectangle import is_inside_rectangle, find_ref_bb
+from utils.check_violate_polygon import is_inside_polygon
+from utils.check_violate_rectangle import is_inside_rectangle, find_ref_bb
 
 class CheckViolate:
     '''
