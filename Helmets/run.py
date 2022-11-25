@@ -1,10 +1,6 @@
-<<<<<<< HEAD
+
 from inference import _load_model, video_inference_v2
 from check_violate import CheckViolate
-=======
-from .inference import _load_model, video_inference_v2 
-from .check_violate import CheckViolate
->>>>>>> e10da6c23a10f2bca1107be1b69032f2c3933d9f
 
 import argparse
 import cv2 as cv
