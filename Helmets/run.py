@@ -1,4 +1,4 @@
-from .inference import _load_model, video_inference_v2
+from .inference import _load_model, video_inference_v2 
 from .check_violate import CheckViolate
 
 import argparse
