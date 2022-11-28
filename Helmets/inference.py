@@ -3,7 +3,7 @@ import cv2 as cv
 import os
 
 from check_violate import CheckViolate
-from utils.ious import custom_nms
+from mutils.ious import custom_nms
 
 def _load_model(weight_path, 
                 agnostic_nms = False, 
@@ -75,7 +75,8 @@ def _inference_v2(img,
                         xmax = int((bb[2] + k) * grid_size) + rx
                         ymax = int((bb[3] + h) * grid_size) + ry
                         _box.append([xmin, ymin, xmax, ymax, bb[-2], bb[-1]])
-    _box = custom_nms(_box)
+    if len(_box) > 1:
+        _box = custom_nms(_box)
     return _box
 
 
@@ -144,11 +145,12 @@ def video_inference_v2(cam_id,
                        approx_region, 
                        size)
     
-    bounding_rect = ckv.bounding_rect
+    bounding_rect = ckv.bounding_rects
     bounding_rect = list(map(_auto_size, bounding_rect))
 
     if save:
         name = cam_id.split(os.sep)[-1]
+        name = name.split('.')[0]
         spath = os.path.join(path, name) if path is not None \
                     else os.path.join(os.getcwd(), f'{name}.avi')
         writer = cv.VideoWriter(spath,
