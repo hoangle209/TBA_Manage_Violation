@@ -21,6 +21,7 @@ parser.add_argument('--mntv', type = int, metavar='', help='number of maximum co
 parser.add_argument('--cam-id', type = str, metavar='', help='camera id')
 parser.add_argument('--size', type = tuple, metavar='', help='Input image size')
 parser.add_argument('--grid-size', type = int, metavar='', help='grid size for tiling detection', default = 576)
+parser.add_argument('--save', type = bool, metavar='', help='save video', default=False)
 
 args = parser.parse_args()
 
@@ -44,6 +45,7 @@ def run():
     
     cam_id = args.cam_id
     show = args.show
+    save = args.save
     video_inference_v2(cam_id,
                        model,
                        vertices,
@@ -54,7 +56,8 @@ def run():
                        max_num_track_violate,
                        approx,
                        size,
-                       show)
+                       show, 
+                       save)
 
 
 if __name__ == '__main__':

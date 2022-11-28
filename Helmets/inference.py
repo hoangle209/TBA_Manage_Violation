@@ -148,8 +148,9 @@ def video_inference_v2(cam_id,
     bounding_rect = list(map(_auto_size, bounding_rect))
 
     if save:
-        spath = path if path is not None \
-                     else os.path.join(os.getcwd(), f'{cam_id}.avi')
+        name = cam_id.split(os.sep)[-1]
+        spath = os.path.join(path, name) if path is not None \
+                    else os.path.join(os.getcwd(), f'{name}.avi')
         writer = cv.VideoWriter(spath,
                                 cv.VideoWriter_fourcc(*'MJPG'),
                                 15, (size[1], size[0]))
@@ -188,10 +189,11 @@ def video_inference_v2(cam_id,
                 c = (255, 0, 0) if v else (0, 255, 0)
 
                 cv.rectangle(img, (x,y), (x+w, y+h), c, 3)
-                cv.putText( img, f'{v}', 
-                            (x, y), 
-                            cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+                cv.putText(img, f'{v}', 
+                           (x, y), 
+                           cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
             writer.write(img[...,::-1])
     
+    writer.release()
     vid.release()
     cv.destroyAllWindows()
