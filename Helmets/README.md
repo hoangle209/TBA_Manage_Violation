@@ -9,6 +9,11 @@
 ```
 
 
+vertices.txt format:
+
+vertices of polygon (space) classes: e.g. x1,y1,x2,y2,...,xn,yn cls1,cls2,...clsm
+
+
 link to model weight:
 [model_weight](https://drive.google.com/drive/folders/1-WhlusIw4caB5QcmzAQJwB5vakEpZMxe)
 
