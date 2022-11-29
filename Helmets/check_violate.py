@@ -16,11 +16,11 @@ class CheckViolate:
         self.approx_region = approx_region
         self.is_inside_polygon = is_inside_polygon
         self.is_inside_rectangle = is_inside_rectangle
-        if self.approx_region:
-            self.find_ref_bb = find_ref_bb
-            self.size = size
-            assert size is not None, print('You have to provide input size of image to use this function')
-            self.bounding_rects = [self.find_ref_bb(vertices, size) for vertices in self.vertices_list]
+        # if self.approx_region:
+        self.find_ref_bb = find_ref_bb
+        self.size = size
+        assert size is not None, print('You have to provide input size of image to use this function')
+        self.bounding_rects = [self.find_ref_bb(vertices, size) for vertices in self.vertices_list]
         self.restart()
 
     def restart(self):
@@ -31,15 +31,15 @@ class CheckViolate:
 
     def is_violate_polygon(self, bboxes, vertices: list, labels: list):
         for bb in bboxes:
-            cx = (bb[0]+bb[2])/2
-            cy = (bb[1]+bb[3])/2
+          try:
+              cx = (bb[0]+bb[2])/2
+              cy = (bb[1]+bb[3])/2
 
-            # if bb[-1] in labels and not is_inside_polygon(restricted_area, (cx, cy)):
-            #     return 1
-            if bb[-1] not in labels and self.is_inside_polygon(vertices, (cx, cy)):
-                return True
-            else:
-                continue
+              if bb[-1] not in labels and self.is_inside_polygon(vertices, (cx, cy)):
+                  print(bb[-1])
+                  return True
+          except:
+              pass
         return False
 
 
@@ -57,6 +57,13 @@ class CheckViolate:
 
 
     def check(self, is_violate, idx):
+        '''
+        This function chekcs if a region is violated
+          :param is_violate: if at the current frame, the region is violated
+          :param idx: id of considered region
+
+          :return whether the region is violated or not
+        '''
         if is_violate:
             if self.count_violate[idx] < self.max_count_violate:
                 self.count_violate[idx] += 1

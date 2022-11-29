@@ -1,6 +1,7 @@
 import torch
 import cv2 as cv
 import os
+import time
 
 from check_violate import CheckViolate
 from mutils.ious import custom_nms
@@ -8,7 +9,9 @@ from mutils.ious import custom_nms
 def _load_model(weight_path, 
                 agnostic_nms = False, 
                 conf_thresh = 0.65):
-                
+    '''
+    Load Model
+    '''    
     model = torch.hub.load('ultralytics/yolov5', 
                            'custom', 
                            path = weight_path)
@@ -18,6 +21,13 @@ def _load_model(weight_path,
 
 
 def _auto_size(ref_rect = None, grid_size = 576):
+    '''
+    This function approximates dimension size to multiple of grid_size
+        :param ref_rect: reference rectangle, [x_top, y_left, w, h]
+        :param grid_size: reference size
+
+        :return the bounding rectangle that has size is multiple of grid_size
+    '''
     rx, ry, rw, rh = ref_rect
     nw = (int(rw/576)+1) * 576
     nh = (int(rh/576)+1) * 576
@@ -36,7 +46,15 @@ def _inference_v2(img,
                   ref_rect = None, 
                   grid_size = 576, 
                   robust = False):
-  
+    '''
+    Inference funtion
+        :param model: model
+        :param ref_rect: do detection only in this region
+        :param robust: do tile detection 
+        :param grid_size: if robust, divide ref_rect into grid of such size 
+
+        :return bounding box of objects
+    '''
     rx, ry, rw, rh = ref_rect
     _img = img[ry:ry+rh, rx:rx+rw, :]
 
@@ -80,27 +98,7 @@ def _inference_v2(img,
     return _box
 
 
-
-color_dict = {
-    0: (0, 138, 0),
-    1: (255, 0, 0),
-    2: (255, 255, 0),
-    3: (255, 255, 255),
-    4: (0, 0, 255),
-    5: (255, 165, 0), 
-    6: (255, 0, 255)
-}
-label_dict = {
-    0: 'None',
-    1: 'Red',
-    2: 'Yellow',
-    3: 'White',
-    4: 'Blue',
-    5: 'Orange', 
-    6: 'Others'
-}
-
-def visual_and_save(_img, _box, save = 'True', save_name = None):
+def visual_and_save(_img, _box, label_dict, color_dict, save = 'True', save_name = None):
     if _box:
         for bb in _box:
             xmin, ymin, xmax, ymax = bb[:4]
@@ -128,7 +126,7 @@ def visual_and_save(_img, _box, save = 'True', save_name = None):
 def video_inference_v2(cam_id, 
                        model, 
                        vertices, 
-                       classes, 
+                       labels, 
                        grid_size = 576, 
                        robust = True,
                        max_count_violate=5,
@@ -138,7 +136,12 @@ def video_inference_v2(cam_id,
                        show = False,
                        save = False,
                        path = None):
-  
+    '''
+    this function checks if restricted areas have violation or not
+        :param model: model
+        :param vertices: vertices of restricted regions
+        :param classes: classes that can enter restricted areas
+    '''
     ckv = CheckViolate(vertices, 
                        max_count_violate, 
                        max_num_track_violate, 
@@ -149,10 +152,30 @@ def video_inference_v2(cam_id,
     bounding_rect = list(map(_auto_size, bounding_rect))
 
     if save:
+        color_dict = {
+            0: (0, 138, 0),
+            1: (255, 0, 0),
+            2: (255, 255, 0),
+            3: (255, 255, 255),
+            4: (0, 0, 255),
+            5: (255, 165, 0), 
+            6: (255, 0, 255)
+        }
+        label_dict = {
+            0: 'None',
+            1: 'Red',
+            2: 'Yellow',
+            3: 'White',
+            4: 'Blue',
+            5: 'Orange', 
+            6: 'Others'
+        }
+
         name = cam_id.split(os.sep)[-1]
         name = name.split('.')[0]
         spath = os.path.join(path, name) if path is not None \
                     else os.path.join(os.getcwd(), f'{name}.avi')
+        print(spath)
         writer = cv.VideoWriter(spath,
                                 cv.VideoWriter_fourcc(*'MJPG'),
                                 15, (size[1], size[0]))
@@ -163,31 +186,35 @@ def video_inference_v2(cam_id,
         if not succ:
             break
 
+        # FPS
+        begin = time.time()
+
         img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
         bbes = []
-
         for rect in bounding_rect:
             bb = _inference_v2(img, 
                                model, 
                                rect, 
                                grid_size, 
-                               robust)
+                               robust) 
             bbes.append(bb)
-            
-        isViolate = ckv.run(bbes, classes)
+        isViolate = ckv.run(bbes, labels)
+
+        t = time.time() - begin
+        print(f'Print something: {isViolate} - FPS: {1/t}')
         
         # if show:
             # TODO show
 
         # TODO Warning
 
+        # TODO save
         if save:
-            # TODO save
             for v, r, bb in zip(isViolate, bounding_rect, bbes):
-                visual_and_save(img, bb, False)
-
+                visual_and_save(img, bb, label_dict, color_dict, False)
                 x,y,w,h = r
+
                 c = (255, 0, 0) if v else (0, 255, 0)
 
                 cv.rectangle(img, (x,y), (x+w, y+h), c, 3)
@@ -196,6 +223,7 @@ def video_inference_v2(cam_id,
                            cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
             writer.write(img[...,::-1])
     
-    writer.release()
+    if save:
+        writer.release()
     vid.release()
     cv.destroyAllWindows()
