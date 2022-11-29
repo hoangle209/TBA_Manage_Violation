@@ -20,7 +20,7 @@ class CheckViolate:
         self.find_ref_bb = find_ref_bb
         self.size = size
         assert size is not None, print('You have to provide input size of image to use this function')
-        self.bounding_rects = [self.find_ref_bb(vertices, size) for vertices in self.vertices_list]
+        self.bounding_rects = [self.find_ref_bb(vertices, self.size) for vertices in self.vertices_list]
         self.restart()
 
     def restart(self):
@@ -36,7 +36,6 @@ class CheckViolate:
               cy = (bb[1]+bb[3])/2
 
               if bb[-1] not in labels and self.is_inside_polygon(vertices, (cx, cy)):
-                  print(bb[-1])
                   return True
           except:
               pass
@@ -45,14 +44,12 @@ class CheckViolate:
 
     def is_violate_rectangle(self, bboxes, vertices, labels):
         for bb in bboxes:
-            try:
-                cx = (bb[0]+bb[2])/2
-                cy = (bb[1]+bb[3])/2
+            cx = (bb[0]+bb[2])/2
+            cy = (bb[1]+bb[3])/2
+            
+            if bb[-1] not in labels and self.is_inside_rectangle((cx, cy), vertices):
+                return True
 
-                if bb[-1] not in labels and self.is_inside_rectangle((cx, cy), vertices):
-                    return True
-            except:
-                pass
         return False
 
 
@@ -112,12 +109,10 @@ class CheckViolate:
         '''
         if self.approx_region:
             violate_inside_area = [self.is_violate_rectangle(bbox, rect, label) \
-                                                            for (bbox, rect, label) \
-                                                            in zip(bboxes, self.bounding_rects, labels)]
+                                   for (bbox, rect, label) in zip(bboxes, self.bounding_rects, labels)]
         else:
             violate_inside_area = [self.is_violate_polygon(bbox, vertices, label) \
-                                                          for (bbox, vertices, label) \
-                                                          in zip(bboxes, self.vertices_list, labels)]
-
+                                   for (bbox, vertices, label) in zip(bboxes, self.vertices_list, labels)]
+        
         is_violate = list(map(self.check, violate_inside_area, [i for i in range(len(violate_inside_area))]))
         return is_violate

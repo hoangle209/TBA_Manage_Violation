@@ -29,7 +29,7 @@ class Args:
         self.parser.add_argument('--size-w', type = int, metavar='', help='Input image size w', default = 1920)
         self.parser.add_argument('--size-h', type = int, metavar='', help='Input image size h', default = 1080)
         self.parser.add_argument('--grid-size', type = int, metavar='', help='grid size for tiling detection', default = 576)
-        self.parser.add_argument('--save', type = bool, metavar='', help='save video', default=False)
+        self.parser.add_argument('--save', action = 'store_true', help='save video')
 
 
     def __call__(self):

@@ -199,6 +199,7 @@ def video_inference_v2(cam_id,
                                grid_size, 
                                robust) 
             bbes.append(bb)
+
         isViolate = ckv.run(bbes, labels)
 
         t = time.time() - begin
@@ -211,7 +212,7 @@ def video_inference_v2(cam_id,
 
         # TODO save
         if save:
-            for v, r, bb in zip(isViolate, bounding_rect, bbes):
+            for v, r, bb in zip(isViolate,ckv.bounding_rects, bbes):
                 visual_and_save(img, bb, label_dict, color_dict, False)
                 x,y,w,h = r
 

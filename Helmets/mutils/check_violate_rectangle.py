@@ -17,6 +17,6 @@ def find_ref_bb(vertices, size):
 def is_inside_rectangle(point, vertices):
     xl, yl, w, h = vertices
     x, y = point
-    if x < xl+w/2 and x > xl-w/2 and y < y+h/2 and y > y-h/2:
+    if x < xl+w and x > xl and y < yl+h and y > yl:
         return True
     return False
