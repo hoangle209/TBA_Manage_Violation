@@ -36,7 +36,6 @@ class CheckViolate:
               cy = (bb[1]+bb[3])/2
 
               if bb[-1] not in labels and self.is_inside_polygon(vertices, (cx, cy)):
-                  print(bb[-1])
                   return True
           except:
               pass
