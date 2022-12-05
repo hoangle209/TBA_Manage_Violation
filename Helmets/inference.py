@@ -2,6 +2,7 @@ import torch
 import cv2 as cv
 import os
 import time
+import numpy as np
 
 from check_violate import CheckViolate
 from mutils.ious import custom_nms
@@ -57,6 +58,12 @@ def _inference_v2(img,
     '''
     rx, ry, rw, rh = ref_rect
     _img = img[ry:ry+rh, rx:rx+rw, :]
+
+    # check if img's dim is not multiple of grid_size
+    if _img.shape[0]%grid_size !=0 or _img.shape[1]%grid_size != 0:
+        new_p = np.zeros(shape = (rh, rw), dtype = np.uint8)
+        new_p[:_img.shape[0], :_img.shape[1], :] = _img
+        _img = new_p
 
     _box = []
 
@@ -212,7 +219,7 @@ def video_inference_v2(cam_id,
 
         # TODO save
         if save:
-            for v, r, bb in zip(isViolate,ckv.bounding_rects, bbes):
+            for v, r, bb in zip(isViolate, ckv.bounding_rects, bbes):
                 visual_and_save(img, bb, label_dict, color_dict, False)
                 x,y,w,h = r
 
